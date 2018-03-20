@@ -1,0 +1,322 @@
+
+create database net5;
+use net5
+
+CREATE  TABLE IF NOT EXISTS Equipo(
+  
+ Codigo		int(15) NOT NULL ,
+
+ Marca		VARCHAR(15) NOT NULL ,
+  
+ ModelO		VARCHAR(20) NOT NULL ,
+  
+ Interfaz	VARCHAR(45) NULL ,
+  
+ Cantidad	INT(11)     NOT NULL ,
+ Tipo		ENUM('R','PC','S','T','SW'),
+ PRIMARY KEY (Codigo))
+ENGINE = InnoDB;
+--------------------------------------
+
+
+
+CREATE  TABLE IF NOT EXISTS Router(
+  
+ Factor_forma	VARCHAR(8) NOT NULL ,
+  
+ SWG		VARCHAR(45) NOT NULL ,
+  
+ Capacidad	VARCHAR(45) NOT NULL ,
+  
+ SO		VARCHAR(45) NOT NULL ,
+  
+ Codigo 	int(15) NOT NULL,
+ FOREIGN KEY (Codigo) REFERENCES Equipo(Codigo))
+ 
+ENGINE = InnoDB;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_router`$$
+CREATE PROCEDURE `net5`.`pa_router`(IN codigo varbinary(15), IN marca varchar(15), IN modelo varchar(20), IN interfaz varchar(45),IN cantidad INT(11), IN factor varchar(8), IN sw varchar(45), IN capacidad varchar(45), IN so varchar(45))
+    BEGIN
+   INSERT INTO Equipo VALUES(codigo, marca, modelo, interfaz, cantidad, 'R');
+INSERT INTO Router VALUES(factor, sw, capacidad, so, codigo);
+    END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_act_router`$$
+CREATE PROCEDURE `net5`.`pa_act_router`(IN cod varbinary(15), IN marc varchar(15), IN mode varchar(20), IN intf varchar(45),IN cant INT(11), IN factor varchar(8), IN sw varchar(45), IN cap varchar(45), IN sis varchar(45))
+    BEGIN
+   UPDATE Equipo SET Marca=marc, ModelO=mode, Interfaz=intf, Cantidad=cant WHERE Codigo=cod;
+   UPDATE Router SET Factor_forma=factor, SWG=sw, Capacidad=cap, SO=sis WHERE Codigo=cod;
+    END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_eli_router`$$
+CREATE PROCEDURE `net5`.`pa_eli_router`(IN cod varbinary(15))
+    BEGIN
+   DELETE FROM Router WHERE Codigo=cod;
+   DELETE FROM Equipo WHERE Codigo=cod;
+    END$$
+DELIMITER ;
+
+CREATE VIEW Routers
+ as
+  SELECT E.Codigo, E.Marca, E.Modelo, E.Interfaz, E.Cantidad, R.Factor_forma, R.SWG, R.Capacidad, R.SO 
+  FROM Equipo as E
+  join Router as R
+  ON E.Codigo=R.Codigo;
+
+-------------------------------
+CREATE  TABLE IF NOT EXISTS Pc(
+  
+ Procesador	VARCHAR(10) NOT NULL ,
+  
+ SO		VARCHAR(15) NOT NULL ,
+  
+ RAM		VARCHAR(15) NOT NULL ,
+  
+ DiscoDuro	VARCHAR(15) NOT NULL ,
+  
+ Codigo 	int(15) NOT NULL,
+ FOREIGN KEY (Codigo) REFERENCES Equipo(Codigo))
+ 
+ENGINE = InnoDB;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_pcs`$$
+CREATE PROCEDURE `net5`.`pa_pcs`(IN codigo varbinary(15), IN marca varchar(15), IN modelo varchar(20), IN interfaz varchar(45),IN cantidad INT(11), IN procesador varchar(10), IN so varchar(15), IN ram varchar(15), IN DiscoDuro varchar(15))
+    BEGIN
+   INSERT INTO Equipo VALUES(codigo, marca, modelo, interfaz, cantidad, 'PC');
+INSERT INTO Pc VALUES(procesador, so, ram, DiscoDuro, codigo);
+    END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_act_pc`$$
+CREATE PROCEDURE `net5`.`pa_act_pc`(IN cod varbinary(15), IN marc varchar(15), IN mode varchar(20), IN intf varchar(45),IN cant INT(11), IN proce varchar(10), IN sis varchar(15), IN ram varchar(15), IN disco varchar(15))
+    BEGIN
+   UPDATE Equipo SET Marca=marc, ModelO=mode, Interfaz=intf, Cantidad=cant WHERE Codigo=cod;
+   UPDATE Pc SET Procesador=proce, SO=sis, RAM=ram, DiscoDuro=disco WHERE Codigo=cod;
+    END$$
+DELIMITER ;
+
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_eli_pc`$$
+CREATE PROCEDURE `net5`.`pa_eli_pc`(IN cod varbinary(15))
+    BEGIN
+   DELETE FROM Pc WHERE Codigo=cod;
+   DELETE FROM Equipo WHERE Codigo=cod;
+    END$$
+DELIMITER ;
+
+CREATE VIEW PCs
+ as
+  SELECT E.Codigo, E.Marca, E.Modelo, E.Interfaz, E.Cantidad, P.Procesador, P.SO, P.RAM, P.DiscoDuro 
+  FROM Equipo as E
+  join Pc as P
+  ON E.Codigo=P.Codigo;
+
+----------------------------------------
+CREATE  TABLE IF NOT EXISTS Servidor(
+  
+ Procesador	VARCHAR(10) NOT NULL ,
+  
+ RAM		VARCHAR(15) NOT NULL ,
+  
+ DiscosDuros	VARCHAR(15) NOT NULL ,
+  
+ SO		VARCHAR(15) NOT NULL ,
+  
+ Codigo 	int(15) NOT NULL,
+ FOREIGN KEY (Codigo) REFERENCES Equipo(Codigo))
+ 
+ENGINE = InnoDB;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_servidores`$$
+CREATE PROCEDURE `net5`.`pa_servidores`(IN codigo varbinary(15), IN marca varchar(15), IN modelo varchar(20), IN interfaz varchar(45),IN cantidad INT(11), IN procesador varchar(10), IN so varchar(15), IN ram varchar(15), IN DiscoDuro varchar(15))
+    BEGIN
+   INSERT INTO Equipo VALUES(codigo, marca, modelo, interfaz, cantidad, 'S');
+INSERT INTO Servidor VALUES(procesador, so, ram, DiscoDuro, codigo);
+    END$$
+DELIMITER ; 
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_act_servidor`$$
+CREATE PROCEDURE `net5`.`pa_act_servidor`(IN cod varbinary(15), IN marc varchar(15), IN mode varchar(20), IN intf varchar(45),IN cant INT(11), IN proce varchar(10), IN sis varchar(15), IN ram varchar(15), IN disco varchar(15))
+    BEGIN
+   UPDATE Equipo SET Marca=marc, ModelO=mode, Interfaz=intf, Cantidad=cant WHERE Codigo=cod;
+   UPDATE Servidor SET Procesador=proce, SO=sis, RAM=ram, DiscoDuro=disco WHERE Codigo=cod;
+    END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_eli_servidor`$$
+CREATE PROCEDURE `net5`.`pa_eli_servidor`(IN cod varbinary(15))
+    BEGIN
+   DELETE FROM Servidor WHERE Codigo=cod;
+   DELETE FROM Equipo WHERE Codigo=cod;
+    END$$
+DELIMITER ;
+
+CREATE VIEW Servidores
+ as
+  SELECT E.Codigo, E.Marca, E.Modelo, E.Interfaz, E.Cantidad, S.Procesador, S.SO, S.RAM, S.DiscoDuro 
+  FROM Equipo as E
+  join Servidor as S
+  ON E.Codigo=S.Codigo;
+-------------------------------------
+CREATE  TABLE IF NOT EXISTS TelVoIP(
+  
+ Memoria VARCHAR(12) NOT NULL ,
+  
+ Pantalla VARCHAR(20) NULL ,
+  
+ NLinea VARCHAR(20) NULL ,
+  
+ Codigo 	int(15) NOT NULL,
+ FOREIGN KEY (Codigo) REFERENCES Equipo(Codigo))
+ 
+ENGINE = InnoDB;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_TelVoIPs`$$
+CREATE PROCEDURE `net5`.`pa_TelVoIPs`(IN codigo varbinary(15), IN marca varchar(15), IN modelo varchar(20), IN interfaz varchar(45),IN cantidad INT(11), IN memoria varchar(12), IN pantalla varchar(20), IN NLinea varchar(20))
+    BEGIN
+   INSERT INTO Equipo VALUES(codigo, marca, modelo, interfaz, cantidad, 'T');
+INSERT INTO TelVoIP VALUES(memoria, so, pantalla, NLinea, codigo);
+    END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_act_tel`$$
+CREATE PROCEDURE `net5`.`pa_act_tel`(IN cod varbinary(15), IN marc varchar(15), IN mode varchar(20), IN intf varchar(45),IN cant INT(11), IN memo varchar(12), IN pant varchar(20), IN linea varchar(20))
+    BEGIN
+   UPDATE Equipo SET Marca=marc, ModelO=mode, Interfaz=intf, Cantidad=cant WHERE Codigo=cod;
+   UPDATE TelVoIP SET Memoria=memo, Pantalla=pant, NLinea=linea WHERE Codigo=cod;
+    END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_eli_tel`$$
+CREATE PROCEDURE `net5`.`pa_eli_tel`(IN cod varbinary(15))
+    BEGIN
+   DELETE FROM TelVoIP WHERE Codigo=cod;
+   DELETE FROM Equipo WHERE Codigo=cod;
+    END$$
+DELIMITER ;
+
+CREATE VIEW TelVoIPs
+ as
+  SELECT E.Codigo, E.Marca, E.Modelo, E.Interfaz, E.Cantidad, T.Memoria, T.Pantalla, T.NLinea
+  FROM Equipo as E
+  join  TelVoIP as T
+  ON E.Codigo=T.Codigo;
+
+
+---------------------------------------------
+
+
+
+CREATE  TABLE IF NOT EXISTS Switch(
+  
+ NumeroPuertos		INT NOT NULL ,
+  
+ TasaTransferencia	VARCHAR(25) NOT NULL ,
+  
+ TipoCable		VARCHAR(20) NULL ,
+ 
+ MetodoAcceso		VARCHAR(25) NULL ,
+  
+ Topologia		VARCHAR(15) NOT NULL ,
+  
+ RAMBuffer		VARCHAR(15) NULL ,
+  
+ MTransmision		VARCHAR(15) NULL ,
+  
+ Codigo 	int(15) NOT NULL,
+ FOREIGN KEY (Codigo) REFERENCES Equipo(Codigo))
+ 
+ENGINE = InnoDB;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `net5`.`pa_Switches`$$
+CREATE PROCEDURE `net5`.`pa_Switches`(IN codigo varbinary(15), IN marca varchar(15), IN modelo varchar(20), IN interfaz varchar(45),IN cantidad INT(11), IN puertos INT(12), IN transferencia varchar(25), IN cable varchar(20), IN acceso varchar(25),IN topologia varchar(15), IN buffer varchar(15), IN transmision varchar(1520))
+    BEGIN
+   INSERT INTO Equipo VALUES(codigo, marca, modelo, interfaz, cantidad);
+INSERT INTO TelVoIP VALUES(puertos, trasferencia, cable, acceso, topologia, buffer, transmision, codigo);
+    END$$
+DELIMITER ;
+
+CREATE VIEW Switches
+ as
+  SELECT E.Codigo, E.Marca, E.Modelo, E.Interfaz, E.Cantidad, S.NumeroPuertos, S.TasaTransferencia, S.TipoCable, S.Topologia, S.RAMBuffer, S.MTransmision
+  FROM Equipo as E
+  join  Switch as S
+  ON E.Codigo=S.Codigo;
+
+--------------------------------------------
+CREATE  TABLE IF NOT EXISTS Usuario(
+  
+ Usuario	VARBINARY(15) NOT NULL ,
+  
+ Contrasenia	VARBINARY(15) NOT NULL ,
+  
+ Tipo 		ENUM('administrador','usuario') DEFAULT 'usuario' ,
+   
+ Correo		VARCHAR(30) NOT NULL ,
+  
+ PRIMARY KEY (Usuario))
+ENGINE = InnoDB;
+
+CREATE  TABLE IF NOT EXISTS Comentarios(
+  
+ IdComentario 	INT AUTO_INCREMENT NOT NULL ,
+  
+ Comentario	TEXT NOT NULL ,
+  
+ Validacion 	BIT NOT NULL DEFAULT 0,
+ Usuario	VARBINARY(15) NULL ,
+
+  
+ PRIMARY KEY (IdComentario),
+ FOREIGN KEY (Usuario) REFERENCES Usuario(usuario))
+ 
+ENGINE = InnoDB;
+
+-------------------------------------------------
+CREATE  TABLE IF NOT EXISTS CamaraIP(
+  
+ Resolucion	VARCHAR(15) NOT NULL ,
+  
+ SO		VARCHAR(15) NOT NULL ,
+  
+ Infrarrojo 	VARCHAR(15) NULL ,
+  
+ Audio	 	VARCHAR(15) NULL ,
+  
+ Codigo 	int(15) NOT NULL,
+ FOREIGN KEY (Codigo) REFERENCES Equipo(Codigo))
+ 
+ENGINE = InnoDB;
+
+
+CREATE  TABLE IF NOT EXISTS AccessPoint(
+  
+ Seguridad		VARCHAR(15) NOT NULL ,
+  
+ TasaTransferencia	VARCHAR(15) NOT NULL ,
+  
+ RangoCobertura		VARCHAR(15) NOT NULL ,
+  
+ RangoFrecuencia	VARCHAR(15) NOT NULL ,
+  
+ Codigo 	int(15) NOT NULL,
+ FOREIGN KEY (Codigo) REFERENCES Equipo(Codigo))
+ 
+ENGINE = InnoDB;
+

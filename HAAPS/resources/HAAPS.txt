@@ -1,0 +1,109 @@
+CREATE DATABASE HAAPS;
+USE HAPPS;
+
+CREATE  TABLE IF NOT EXISTS Proyecto (
+  Nombre VARCHAR(500) NOT NULL ,
+  Descripcion TEXT NOT NULL ,
+  Responsable TEXT NOT NULL ,
+  PRIMARY KEY (Nombre) )ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS Documentos (
+  Id INT AUTO_INCREMENT NOT NULL,
+  Nombre VARCHAR(50) NOT NULL ,
+  Descripcion TEXT NULL ,
+  Contenido BLOB NOT NULL ,
+  Tipo VARCHAR(50) NOT NULL ,
+  Proyecto VARCHAR(500) NOT NULL ,
+  FOREIGN KEY (Proyecto) REFERENCES Proyecto(Nombre) ,
+  PRIMARY KEY (Id) ) ENGINE = InnoDB;
+
+CREATE  TABLE IF NOT EXISTS Usuario (
+  Email VARBINARY(30) NOT NULL ,
+  Contrasenia VARBINARY(15) NOT NULL ,
+  Preg TEXT NULL ,
+  Resp TEXT NULL ,
+  Tipo ENUM('Admin','Cliente') DEFAULT 'Cliente' ,
+  Proyecto VARCHAR(500) NULL ,
+  FOREIGN KEY (Proyecto) REFERENCES Proyecto(Nombre) ,
+  PRIMARY KEY (Email) )ENGINE = InnoDB;
+
+INSERT INTO Usuario (Email, Contrasenia, Tipo) VALUES ('hectorrochamorales@hotmail.com','abc1234567890','Admin');
+INSERT INTO Usuario (Email, Contrasenia, Tipo, Verf) VALUES ('hectorrochamorales@yahoo.com','abc1234567890','Cliente','');
+
+
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS `HAAPS`.`pa_Proyecto`$$
+CREATE PROCEDURE `HAAPS`.`pa_proyecto`(IN nombre varchar(500), IN descripcion text, IN responsable text)
+    BEGIN
+   INSERT INTO proyecto VALUES(nombre, descripcion, responsable);
+    END$$
+DELIMITER ;
+
+call pa_proyecto('megacines', 'pagina web dinamica', 'Socorro Silva Morales');
+
+CREATE VIEW Proyectos
+ as
+  SELECT p.Nombre as Proyecto, p.Descripcion, p.Responsable 
+  FROM PROYECTO as p;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS pa_act_proyecto $$
+CREATE PROCEDURE pa_act_proyecto (IN nom varchar(500), IN descrip text, IN respon text)
+    BEGIN
+   UPDATE Proyecto SET Descripcion=descrip, Responsable=respon WHERE Nombre=nom;
+    END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS pa_eli_proyecto $$
+CREATE PROCEDURE pa_eli_proyecto (IN nom varchar(500))
+    BEGIN
+   DELETE FROM Documentos WHERE Proyecto=nom;
+   DELETE FROM Proyecto WHERE Nombre=nom;
+    END$$
+DELIMITER ;
+
+CREATE VIEW TDocumentos
+ as
+  SELECT d.Id, d.Nombre, d.Descripcion
+  FROM Documentos as d;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS pa_eli_documento $$
+CREATE PROCEDURE pa_eli_documento (IN iden int)
+    BEGIN
+   DELETE FROM Documentos WHERE Id=iden;
+    END$$
+DELIMITER ;
+
+CREATE VIEW usuarios
+ as
+  SELECT u.Email, u.Tipo, u.Proyecto
+  FROM usuario as u;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS pa_cliente $$
+CREATE PROCEDURE pa_cliente (IN correo varbinary(30), IN contra varbinary(15), IN proy varchar(500))
+    BEGIN
+   INSERT INTO usuario (Email, Contrasenia, Proyecto) VALUES(correo, contra, proy);
+    END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS pa_act_cliente $$
+CREATE PROCEDURE pa_act_cliente (IN correo varbinary(30), IN contra varbinary(15))
+    BEGIN
+   UPDATE Usuario SET contrasenia=contra WHERE Email=correo;
+    END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS pa_eli_usuarios $$
+CREATE PROCEDURE pa_eli_usuarios (IN correo varbinary(30))
+    BEGIN
+   DELETE FROM usuario WHERE Email=correo;
+    END$$
+DELIMITER ;
+
+----------------

@@ -1,0 +1,27 @@
+<?php
+	include('ajax/clases/baseDatos.class.php');
+	session_start();
+	
+	$email	= trim($_POST['txtEmail']);
+	$contraseña	= trim($_POST['txtContrasenia']);
+	$valido = "";
+	$bd 	= bD::getInstance();
+	$resultado = $bd->consultar("usuario","Tipo", "WHERE Email='".$email."' and Contrasenia='".$contraseña."'");
+	
+	foreach($resultado as $res){
+		$valido = trim($res->Tipo); 
+		 }
+	if($valido=="Cliente"){
+		$_SESSION['autentificado']="1";
+		$_SESSION['user']=$_POST['txtEmail'];
+		header("Location: cliente.php");
+		}
+	elseif($valido=="Admin"){
+		$_SESSION['autentificado']="1";
+		$_SESSION['user']=$_POST['txtEmail'];
+		header("Location: admin.php");
+		}
+	else{
+		header("Location: Integracion-comunicacion.php");
+	}
+?>
